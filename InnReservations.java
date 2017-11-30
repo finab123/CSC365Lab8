@@ -8,34 +8,26 @@ import java.sql.*;
 public class InnReservations {
    private static Connection conn = null;
    public static void main(String[] args) {
-       //Load the mysql JDBC driver
-      try {
-         Class.forName("com.mysql.jdbc.Driver").newInstance();
-         System.out.println("Driver class found and loaded.");
-      }
-      catch (Exception e) {
-         System.out.println("Driver not found... " + e);
-      };
-      
-      try {
-         Scanner serverScanner = new Scanner(new File("ServerSettings.txt"));
-         String url = serverScanner.nextLine();
-         String userName = serverScanner.nextLine();
-         String password = serverScanner.nextLine();
-	 String connectionString = url + userName + "?user=" + userName +
-            "&password=" + password;
-	 System.out.println(connectionString);
+       String url = "";
+       String userName = "";
+       String password = "";
 
-         conn = DriverManager.getConnection(connectionString);       
+       //Load the mysql JDBC driver
+       try {
+           Scanner serverScanner = new Scanner(new File("ServerSettings.txt"));
+           url = serverScanner.nextLine();
+           userName = serverScanner.nextLine();
+           password = serverScanner.nextLine();
       }
       catch(FileNotFoundException e) {
          System.out.println("File not found.. " + e);
-      }
-      catch(Exception e) {
-         System.out.println("Could not open connection");
          System.exit(-1);
       }
-      System.out.println("\nConnected to mySQL!\n");
+      establishConnection(url, userName, password);
+   
+      checkTable(userName, "reservations");
+      checkTable(userName, "rooms");
+
       Scanner inputScanner = new Scanner(System.in);
       printMenuOptions(); 
 
@@ -68,6 +60,54 @@ public class InnReservations {
       
    }
 
+   private static void establishConnection(String url, String userName, String password) {
+      try {
+         Class.forName("com.mysql.jdbc.Driver").newInstance();
+         System.out.println("Driver class found and loaded.");
+      }
+      catch (Exception e) {
+         System.out.println("Driver not found... " + e);
+      };
+
+      try {
+         String connectionString = url + userName + "?user=" + userName +
+            "&password=" + password;
+         System.out.println(connectionString);
+
+         conn = DriverManager.getConnection(connectionString);
+      }
+      catch(Exception e) {
+         System.out.println("Could not open connection");
+         System.exit(-1);
+      }
+      System.out.println("\nConnected to mySQL!\n");
+   }
+
+   private static void checkTable(String userName, String tableName) {
+      try {
+         //Check if the tables exist..
+         Statement s = conn.createStatement();
+         ResultSet r = s.executeQuery("SELECT table_name FROM information_schema.tables"
+	   + " WHERE table_schema = '" + userName+"' AND table_name = '" +tableName+"'");
+         r.last();
+         //table does not exist, create it. 
+         if(r.getRow() == 0) {
+            String table = "CREATE TABLE " + tableName;
+            if(tableName.equals("reservations")) {
+              table += "(code char(30) PRIMARY KEY, id CHAR(3) REFERENCES ROOMS(id), checkIn DATE, checkOut DATE, " +
+                    "rate DECIMAL(6, 2), lastName char(30), firstName char(30), adults TINYINT, kids TINYINT)";
+            }
+            else if(tableName.equals("rooms")) {
+               table += "(id CHAR(5) PRIMARY KEY, name CHAR(30) UNIQUE, beds TINYINT, bedType char(20), "
+                   + "maxOccupancy INTEGER, basePrice DECIMAL(6, 2), decor char(30))";
+            }
+            s.executeUpdate(table);
+         }
+      }
+      catch(Exception e) {
+         System.out.println(e);
+      }
+   }
    private static void printMenuOptions() {
       System.out.println("Select a sub-system by number: ");
       System.out.println("[1] Admin");
