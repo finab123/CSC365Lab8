@@ -5,4 +5,4 @@ To compile:
 javac *.java
 
 To run: 
-java InnResrvations
+java InnReservations

@@ -32,28 +32,35 @@ public class InnReservations {
       printMenuOptions(); 
 
       String option;
-      boolean isValid = false;
-      while(!isValid) {
+      boolean isValid = true;
+      while(isValid) {
           option = inputScanner.next();
           switch(option) {
+            case "0":
+                printMenuOptions();
+                break;
             case "1":
                System.out.println("ADmin stuff..");
-               isValid = true;
+               AdminMenu menu = new AdminMenu(conn);
+               menu.startMenu();
+               ClearScreen.clear();
+               printMenuOptions();
                break;
             case "2":
                System.out.println("Owner...");
-               isValid = true;
+               ClearScreen.clear();
+               printMenuOptions();
                break;
             case "3":
                 System.out.println("Guest...");
-                isValid = true;
+                ClearScreen.clear();
+                printMenuOptions();
                 break;
             case "4":
                 System.out.println("Exiting...");
                 System.exit(0);
             default:
                System.out.println("Enter a valid option...");
-               isValid = false;
                break;
          }
       }
@@ -110,9 +117,11 @@ public class InnReservations {
    }
    private static void printMenuOptions() {
       System.out.println("Select a sub-system by number: ");
+      System.out.println("[0] Show Menu Options");
       System.out.println("[1] Admin");
       System.out.println("[2] Owner");
       System.out.println("[3] Guest");
       System.out.println("[4] Quit");
+      System.out.println();
    }
 }
