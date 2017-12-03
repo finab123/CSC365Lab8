@@ -14,8 +14,8 @@ import java.text.SimpleDateFormat;
 
 public class AdminMenu {
 
-    private static final String ROOM_TABLE = "testRoom";
-    private static final String RES_TABLE = "testRes"; 
+    private static final String ROOM_TABLE = "rooms";
+    private static final String RES_TABLE = "reservations"; 
     private Connection conn = null;
     private Scanner inputScanner = null;
 
